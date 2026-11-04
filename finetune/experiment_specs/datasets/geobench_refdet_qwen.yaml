@@ -1,0 +1,7 @@
+extends: geobench_refdet.yaml
+overrides:
+  paths:
+    final_adapter_dir: ./finetuned_qwen/geobench-refdet
+    validation_result_dir: ./finetune_results/qwen3-vl-32b/validation/geobench-refdet
+    test_result_dir: ./results/finetune/qwen3-vl-32b/test/geobench-refdet
+    manifest_dir: ./finetune_results/qwen3-vl-32b/manifests/geobench-refdet

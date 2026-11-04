@@ -1,0 +1,41 @@
+task: xview2
+adapter_name: xview2
+dataset: {id: danielz01/xView2, config: competition}
+splits:
+  strategy: resplit_native_train_90_10_keep_native_test
+  seed: 0
+  train: {source_split: train}
+  validation: {source_split: train}
+  test: {source_split: test}
+prompt:
+  authoritative_script: ./evaluation/tasks/xview2.py
+  system_symbol: SYSTEM_MESSAGE
+  user_symbol: USER_PROMPT
+  dynamic: false
+  dynamic_builder_symbols: []
+input: {image_count: 2, image_order: [pre_disaster_image, post_disaster_image]}
+assistant_answer:
+  encoding: json
+  schema: '{"count_before": n, "no_damage": n, "minor_damage": n, "major_damage": n, "destroyed": n}'
+  required_keys: [count_before, no_damage, minor_damage, major_damage, destroyed]
+validation:
+  # mean of building-counting r2 (count_before) and change-detection macro r2
+  # over the four damage categories
+  metric: r2
+  direction: maximize
+  fields: [count_before, no_damage, minor_damage, major_damage, destroyed]
+  aggregation: equal_weight_benchmark_tasks
+  parse_failure_policy: zero_per_field
+paths:
+  raw_dataset_root: ./raw_dataset
+  prepared_dir: ./finetune/data/xview2
+  final_adapter_dir: ./finetuned_qwen/xview2
+  validation_result_dir: ./finetune_results/qwen3-vl-32b/validation/xview2
+  test_result_dir: ./finetune_results/qwen3-vl-32b/test/xview2
+  manifest_dir: ./finetune_results/qwen3-vl-32b/manifests/xview2
+status:
+  data_preparation: not_started
+  resolution_selection: not_started
+  training: not_started
+  validation: blocked
+  test: blocked

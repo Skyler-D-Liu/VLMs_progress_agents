@@ -1,0 +1,41 @@
+task: cowc
+adapter_name: cowc
+dataset:
+  id: danielz01/cowc-m
+  configs: [Columbus, Potsdam, Selwyn, Toronto, Utah, Vaihingen]
+splits:
+  strategy: city_stratified_single_source_80_10_10
+  seed: 0
+  train: {source_split: train}
+  validation: {source_split: train}
+  test: {source_split: train}
+prompt:
+  authoritative_script: ./evaluation/tasks/cowc.py
+  system_symbol: SYSTEM_MESSAGE
+  user_symbol: get_user_prompt
+  dynamic: false
+  dynamic_builder_symbols: []
+input: {image_count: 1, image_order: [aerial_image]}
+assistant_answer:
+  encoding: json
+  schema: '{"count": <nonnegative integer>}'
+  required_keys: [count]
+validation:
+  metric: r2
+  direction: maximize
+  fields: []
+  aggregation: null
+  parse_failure_policy: zero_prediction
+paths:
+  raw_dataset_root: ./raw_dataset
+  prepared_dir: ./finetune/data/cowc
+  final_adapter_dir: ./finetuned_qwen/cowc
+  validation_result_dir: ./finetune_results/qwen3-vl-32b/validation/cowc
+  test_result_dir: ./finetune_results/qwen3-vl-32b/test/cowc
+  manifest_dir: ./finetune_results/qwen3-vl-32b/manifests/cowc
+status:
+  data_preparation: provisional_existing
+  resolution_selection: not_started
+  training: not_started
+  validation: not_started
+  test: not_started

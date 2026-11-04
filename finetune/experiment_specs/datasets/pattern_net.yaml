@@ -1,0 +1,39 @@
+task: pattern-net
+adapter_name: pattern-net
+dataset: {id: danielz01/pattern-net, config: default}
+splits:
+  strategy: single_source_80_10_10
+  seed: 0
+  train: {source_split: train}
+  validation: {source_split: train}
+  test: {source_split: train}
+prompt:
+  authoritative_script: ./evaluation/tasks/pattern_net.py
+  system_symbol: SYSTEM_MESSAGE
+  user_symbol: get_user_prompt
+  dynamic: false
+  dynamic_builder_symbols: []
+input: {image_count: 1, image_order: [satellite_image]}
+assistant_answer:
+  encoding: json
+  schema: '{"category": "<exact canonical 34-class name>"}'
+  required_keys: [category]
+validation:
+  metric: accuracy
+  direction: maximize
+  fields: []
+  aggregation: null
+  parse_failure_policy: refusal_tiebreak
+paths:
+  raw_dataset_root: ./raw_dataset
+  prepared_dir: ./finetune/data/pattern-net
+  final_adapter_dir: ./finetuned_qwen/pattern-net
+  validation_result_dir: ./finetune_results/qwen3-vl-32b/validation/pattern-net
+  test_result_dir: ./finetune_results/qwen3-vl-32b/test/pattern-net
+  manifest_dir: ./finetune_results/qwen3-vl-32b/manifests/pattern-net
+status:
+  data_preparation: not_started
+  resolution_selection: not_started
+  training: not_started
+  validation: not_started
+  test: blocked

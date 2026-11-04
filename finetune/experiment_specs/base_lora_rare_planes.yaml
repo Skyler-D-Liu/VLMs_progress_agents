@@ -1,0 +1,10 @@
+extends: base_lora.yaml
+overrides:
+  paths:
+    prepared_data_template: ./finetune/data/rare-planes/{task}
+    temporary_trial_template: ./qwen3_vl_32b_lora_trials/rare-planes/{task}/lr-{learning_rate}-seed-{seed}
+    final_adapter_template: ./finetuned_qwen/rare-planes/{adapter_name}
+    permanent_result_root: ./results/finetune/qwen3-vl-32b
+    validation_result_template: ./results/finetune/qwen3-vl-32b/validation/{task}
+    test_result_template: ./results/finetune/qwen3-vl-32b/test/{task}
+    manifest_template: ./results/finetune/qwen3-vl-32b/manifests/{task}

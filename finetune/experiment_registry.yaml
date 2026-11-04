@@ -1,0 +1,17 @@
+readiness:
+  training_allowed: true
+  test_allowed: true
+  blockers: []
+
+tasks:
+  aerial-animal: {blockers: []}
+  cowc: {blockers: []}
+  dior-rsvg: {blockers: []}
+  dior-rsvg-recognition: {blockers: []}
+  fpcd: {blockers: []}
+  geobench-refdet: {blockers: []}
+  landmarks: {blockers: []}
+  neon-tree: {blockers: []}
+  pattern-net: {blockers: []}
+  rare-planes: {blockers: []}
+  xview2: {blockers: []}

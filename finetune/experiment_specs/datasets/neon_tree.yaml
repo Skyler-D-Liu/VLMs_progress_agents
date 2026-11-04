@@ -1,0 +1,39 @@
+task: neon-tree
+adapter_name: neon-tree
+dataset: {id: CanopyRS/NeonTreeEvaluation, config: default}
+splits:
+  strategy: reuse_native_train_validation_test
+  seed: 0
+  train: {source_split: train}
+  validation: {source_split: validation}
+  test: {source_split: test}
+prompt:
+  authoritative_script: ./evaluation/tasks/neon_trees.py
+  system_symbol: SYSTEM_MESSAGE
+  user_symbol: USER_PROMPT
+  dynamic: false
+  dynamic_builder_symbols: []
+input: {image_count: 1, image_order: [canopy_tile]}
+assistant_answer:
+  encoding: plain_text
+  schema: nonnegative_integer_only
+  required_keys: []
+validation:
+  metric: r2
+  direction: maximize
+  fields: []
+  aggregation: null
+  parse_failure_policy: zero_prediction
+paths:
+  raw_dataset_root: ./raw_dataset
+  prepared_dir: ./finetune/data/neon-tree
+  final_adapter_dir: ./finetuned_qwen/neon-tree
+  validation_result_dir: ./finetune_results/qwen3-vl-32b/validation/neon-tree
+  test_result_dir: ./finetune_results/qwen3-vl-32b/test/neon-tree
+  manifest_dir: ./finetune_results/qwen3-vl-32b/manifests/neon-tree
+status:
+  data_preparation: not_started
+  resolution_selection: not_started
+  training: not_started
+  validation: not_started
+  test: not_started

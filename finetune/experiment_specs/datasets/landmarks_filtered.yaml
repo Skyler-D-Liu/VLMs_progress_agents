@@ -1,0 +1,7 @@
+extends: landmarks.yaml
+overrides:
+  splits:
+    train: {source_split: train}
+    validation: {source_split: train}
+    test: {source_split: train}
+  generation: {max_new_tokens: 1024, do_sample: false}

@@ -1,0 +1,39 @@
+task: fpcd
+adapter_name: fpcd
+dataset: {id: ctundia/FPCD, config: default}
+splits:
+  strategy: resplit_native_train_90_10_keep_native_test
+  seed: 0
+  train: {source_split: train}
+  validation: {source_split: train}
+  test: {source_split: test}
+prompt:
+  authoritative_script: ./evaluation/tasks/fpcd.py
+  system_symbol: SYSTEM_MESSAGE
+  user_symbol: USER_PROMPT
+  dynamic: false
+  dynamic_builder_symbols: [format_answer]
+input: {image_count: 2, image_order: [T0_pre_image, T1_post_image]}
+assistant_answer:
+  encoding: json
+  schema: '{"answer":"A"}'
+  required_keys: [answer]
+validation:
+  metric: accuracy
+  direction: maximize
+  fields: []
+  aggregation: null
+  parse_failure_policy: incorrect
+paths:
+  raw_dataset_root: ./raw_dataset
+  prepared_dir: ./finetune/data/fpcd
+  final_adapter_dir: ./finetuned_qwen/fpcd
+  validation_result_dir: ./finetune_results/qwen3-vl-32b/validation/fpcd
+  test_result_dir: ./finetune_results/qwen3-vl-32b/test/fpcd
+  manifest_dir: ./finetune_results/qwen3-vl-32b/manifests/fpcd
+status:
+  data_preparation: not_started
+  resolution_selection: not_started
+  training: not_started
+  validation: blocked
+  test: blocked

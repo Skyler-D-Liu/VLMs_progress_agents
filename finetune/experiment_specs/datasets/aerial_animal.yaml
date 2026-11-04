@@ -1,0 +1,54 @@
+task: aerial-animal
+adapter_name: aerial-animal
+
+dataset:
+  id: danielz01/aerial-animal-population-4tu
+  config: default
+
+splits:
+  strategy: reuse_native_train_val_test
+  seed: 0
+  train:
+    source_split: train
+  validation:
+    source_split: val
+  test:
+    source_split: test
+
+prompt:
+  authoritative_script: ./evaluation/tasks/aerial_animal.py
+  system_symbol: SYSTEM_MESSAGE
+  user_symbol: USER_PROMPT
+  dynamic: false
+  dynamic_builder_symbols: []
+
+input:
+  image_count: 1
+  image_order: [aerial_image]
+
+assistant_answer:
+  encoding: json
+  schema: '{"elephants": <nonnegative integer>, "zebras": <nonnegative integer>, "giraffes": <nonnegative integer>}'
+  required_keys: [elephants, zebras, giraffes]
+
+validation:
+  metric: r2
+  direction: maximize
+  fields: []
+  aggregation: null
+  parse_failure_policy: zero_prediction
+
+paths:
+  raw_dataset_root: ./raw_dataset
+  prepared_dir: ./finetune/data/aerial_animal
+  final_adapter_dir: ./finetuned_qwen/aerial-animal
+  validation_result_dir: ./finetune_results/qwen3-vl-32b/validation/aerial-animal
+  test_result_dir: ./finetune_results/qwen3-vl-32b/test/aerial-animal
+  manifest_dir: ./finetune_results/qwen3-vl-32b/manifests/aerial-animal
+
+status:
+  data_preparation: provisional_existing
+  resolution_selection: not_started
+  training: not_started
+  validation: not_started
+  test: not_started

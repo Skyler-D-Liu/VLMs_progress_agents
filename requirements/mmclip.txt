@@ -1,0 +1,7 @@
+numpy
+pillow
+opencv-python-headless
+torch
+datasets
+transformers
+huggingface-hub

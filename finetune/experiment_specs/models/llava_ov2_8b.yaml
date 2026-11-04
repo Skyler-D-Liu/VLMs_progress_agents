@@ -1,0 +1,95 @@
+registry:
+  path: ./finetune/experiment_registry.yaml
+scope:
+  experiment: corresponding_task_lora_zero_shot
+  few_shot_k: 0
+  complete_canonical_test_split: true
+  test_based_tuning: false
+base_model:
+  name: LLaVA-OneVision-2-8B-Instruct
+  path: ./downloaded_LLaVA/LLaVA-OV-2-8B
+  architecture: LlavaOnevision2ForConditionalGeneration
+  model_type: llava_onevision2
+  identity_files: [config.json, model.safetensors.index.json, preprocessor_config.json]
+paths:
+  repository_root: .
+  raw_dataset_root: ./raw_dataset
+  prepared_data_template: ./finetune/data/{task}
+  temporary_trial_template: ./llava_ov2_8b_lora_trials/{task}/lr-{learning_rate}-seed-{seed}
+  final_adapter_template: ./finetuned_llava/{adapter_name}
+  permanent_result_root: ./results/finetune/llava-ov2-8b
+  validation_result_template: ./results/finetune/llava-ov2-8b/validation/{task}
+  test_result_template: ./results/finetune/llava-ov2-8b/test/{task}
+  manifest_template: ./results/finetune/llava-ov2-8b/manifests/{task}
+hardware:
+  gpu_type: h200
+  gpus_per_trial: 1
+  required_memory_headroom_fraction: 0.10
+training:
+  method: qlora
+  loss_scope: assistant_only
+  mask_non_assistant_tokens: true
+  truncate_gold_answer: false
+  overflow_action: reject
+  max_length: 16384
+  attention_implementation: sdpa
+  quantization: {bits: 4, method: bnb, quant_type: nf4, double_quantization: true, compute_dtype: bfloat16}
+  lora: {rank: 8, alpha: 32, dropout: 0.05, target_modules: language_decoder_attention_mlp, freeze_vision_encoder: true}
+  batch: {per_device_train_batch_size: 1, per_device_eval_batch_size: 1, gradient_accumulation_steps: 8, effective_global_batch_size: 8}
+  optimizer: {name: adamw_torch_fused, weight_decay: 0.1, beta1: 0.9, beta2: 0.95, epsilon: 0.00000001, max_grad_norm: 1.0}
+  scheduler: {name: cosine, warmup_ratio: 0.03}
+  gradient_checkpointing: true
+  data_augmentation: none
+  seed: 0
+  data_seed: 0
+  additional_training_seeds: []
+search:
+  searchable_parameters: [learning_rate]
+  forbidden_search_parameters: [lora_rank, lora_alpha, lora_dropout, target_modules, quantization, batch_size, gradient_accumulation_steps, optimizer, scheduler, seed, image_resolution_by_performance]
+  learning_rate: {initial_values: [0.00001, 0.00002, 0.00005], lower_boundary_value: 0.00001, lower_expansion_value: 0.000005, upper_boundary_value: 0.00005, upper_expansion_value: 0.0001, maximum_expansion_rounds: 1}
+  # duration / early_stopping apply only to the legacy epoch-based search used when
+  # successive_halving is disabled; the paper protocol (Supplement S.3-C) uses
+  # successive_halving below and one-epoch final training.
+  duration: {validation_interval_epochs: 1, initial_max_epochs: 5, extended_max_epochs: 10, extend_when_best_checkpoint_at_epoch: 5, extend_only_same_learning_rate_trial: true, extend_beyond_epoch_10: false}
+  early_stopping: {patience_validation_events: 2, min_delta: 0.0, improvement_must_be_strict: true}
+  successive_halving: {enabled: true, budget_unit: optimizer_steps, rung_steps: [32, 64, 128], survivors_after_rung: [2, 1, 1], screening_sampling: deterministic_order, screening_rungs_use_fixed_validation_subset: true, screening_validation_max_examples: 256, restart_final_training_from_base: true, final_training_sampling: deterministic_stratified, final_training_max_optimizer_steps: 1024, maximum_optimizer_step_equivalents_per_task: 1376, final_training_uses_complete_validation: true, final_training_max_epochs: 1, final_training_scheduler_horizon_epochs: 1, final_training_patience_validation_events: 0, target_wall_clock_compute_hours: 24.0, queue_time_excluded_from_target: true}
+  global_tie_break_order: [primary_validation_metric, lower_parse_failure_or_refusal_rate, earlier_epoch, lower_learning_rate]
+  tune_each_task_independently: true
+  aggregate_rank_across_tasks: false
+resolution:
+  selection_basis: gpu_memory_only
+  statistics_splits: [train, validation]
+  inspect_test_split: false
+  preserve_aspect_ratio: true
+  crop: false
+  tile: false
+  stretch: false
+  offline_resize: false
+  augmentation: false
+  statistics: [min, p50, p90, p95, max]
+  stress_examples: [p95, max]
+  required_checks: [forward_backward_training_step, deterministic_validation_generation]
+  candidates_high_to_low:
+    - {id: processor-default, max_pixels_per_image: 16777216, max_visual_tokens_per_image: null}
+    - {id: visual-tokens-4096, max_pixels_per_image: 4194304, max_visual_tokens_per_image: 4096}
+    - {id: visual-tokens-2304, max_pixels_per_image: 2359296, max_visual_tokens_per_image: 2304}
+    - {id: visual-tokens-1280, max_pixels_per_image: 1310720, max_visual_tokens_per_image: 1280}
+  choose_highest_stable_candidate: true
+  required_memory_headroom_fraction: 0.10
+  validation_performance_must_not_be_used: true
+  test_properties_must_not_be_used: true
+  selected_value_fixed_across_task_trials_and_test: true
+test_policy:
+  eligible_only_after_validation_selection_and_adapter_promotion: true
+  eligible_only_after_evaluator_conformance: true
+  one_final_result_per_task: true
+  complete_canonical_split_required: true
+  subsampling_allowed: false
+  interrupted_run_may_resume_same_jsonl: true
+  interrupted_run_may_resample: false
+  new_result_after_partial_failure: false
+  completion_marker: TEST_COMPLETED.json
+  completion_marker_atomic_write: true
+  completion_marker_required_fields: [task]
+  parameter_changes_after_completion_forbidden: true
+  evaluation_scope: complete_canonical_split

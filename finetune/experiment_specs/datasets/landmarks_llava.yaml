@@ -1,0 +1,7 @@
+extends: landmarks_filtered.yaml
+overrides:
+  paths:
+    final_adapter_dir: ./finetuned_llava/landmarks
+    validation_result_dir: ./finetune_results/llava-ov2-8b/validation/landmarks
+    test_result_dir: ./results/finetune/llava-ov2-8b/test/landmarks
+    manifest_dir: ./finetune_results/llava-ov2-8b/manifests/landmarks

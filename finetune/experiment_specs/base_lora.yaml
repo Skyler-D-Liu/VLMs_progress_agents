@@ -1,0 +1,2 @@
+extends: models/qwen3_vl_32b.yaml
+overrides: {}

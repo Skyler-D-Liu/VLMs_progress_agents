@@ -1,0 +1,37 @@
+task: geobench-refdet
+adapter_name: geobench-refdet
+dataset: {id: aialliance/GEOBench-VLM, config: Ref-Det}
+splits:
+  # GEOBench-VLM releases no training split: DOTA and FAIR1M samples are divided
+  # 80:10:10 (image-disjoint, per source dataset) into train/validation/test.
+  strategy: single_source_80_10_10
+  seed: 0
+  train: {source_split: Ref-Det}
+  validation: {source_split: Ref-Det}
+  test: {source_split: Ref-Det}
+prompt:
+  authoritative_script: ./evaluation/tasks/geobench_refdet_authority.py
+  system_symbol: SYSTEM_MESSAGE
+  user_symbol: get_user_prompt
+  dynamic: true
+  dynamic_builder_symbols: [get_user_prompt]
+input: {image_count: 1, image_order: [satellite_image]}
+generation: {max_new_tokens: 128, do_sample: false}
+assistant_answer:
+  encoding: json
+  schema: '{"bboxes": [box]}; FAIR1M box = [[x1,y1],[x2,y2],[x3,y3],[x4,y4]]; DOTA box = [xmin,ymin,xmax,ymax]'
+  required_keys: [bboxes]
+validation:
+  metric: mean_iou
+  direction: maximize
+  fields: []
+  aggregation: null
+  parse_failure_policy: incorrect
+paths:
+  raw_dataset_root: ./raw_dataset
+  prepared_dir: ./finetune/data/geobench-refdet
+  final_adapter_dir: ./finetuned_llava/geobench-refdet
+  validation_result_dir: ./results/finetune/llava-ov2-8b/validation/geobench-refdet
+  test_result_dir: ./results/finetune/llava-ov2-8b/test/geobench-refdet
+  manifest_dir: ./results/finetune/llava-ov2-8b/manifests/geobench-refdet
+status: {data_preparation: not_started, resolution_selection: not_started, training: not_started, validation: not_started, test: not_started}

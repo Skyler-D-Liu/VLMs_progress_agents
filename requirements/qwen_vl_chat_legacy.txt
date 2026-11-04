@@ -1,0 +1,7 @@
+transformers==4.37.2
+tokenizers==0.15.2
+huggingface-hub==0.36.0
+fsspec==2026.4.0
+transformers-stream-generator==0.0.5
+tiktoken
+einops

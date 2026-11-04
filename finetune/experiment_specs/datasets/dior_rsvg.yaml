@@ -1,0 +1,39 @@
+task: dior-rsvg
+adapter_name: dior-rsvg
+dataset: {id: danielz01/DIOR-RSVG, config: default}
+splits:
+  strategy: reuse_native_train_val_test
+  seed: 0
+  train: {source_split: train}
+  validation: {source_split: val}
+  test: {source_split: test}
+prompt:
+  authoritative_script: ./evaluation/tasks/dior_rsvg_localization.py
+  system_symbol: SYSTEM_MESSAGE
+  user_symbol: get_detection_prompt
+  dynamic: true
+  dynamic_builder_symbols: []
+input: {image_count: 1, image_order: [satellite_image]}
+assistant_answer:
+  encoding: json
+  schema: '{"bbox": [xmin, ymin, xmax, ymax]}'
+  required_keys: [bbox]
+validation:
+  metric: mean_iou
+  direction: maximize
+  fields: []
+  aggregation: null
+  parse_failure_policy: incorrect
+paths:
+  raw_dataset_root: ./raw_dataset
+  prepared_dir: ./finetune/data/dior-rsvg
+  final_adapter_dir: ./finetuned_qwen/dior-rsvg
+  validation_result_dir: ./finetune_results/qwen3-vl-32b/validation/dior-rsvg
+  test_result_dir: ./finetune_results/qwen3-vl-32b/test/dior-rsvg
+  manifest_dir: ./finetune_results/qwen3-vl-32b/manifests/dior-rsvg
+status:
+  data_preparation: not_started
+  resolution_selection: not_started
+  training: not_started
+  validation: not_started
+  test: not_started

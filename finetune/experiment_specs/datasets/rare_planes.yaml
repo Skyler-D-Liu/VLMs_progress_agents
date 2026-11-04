@@ -1,0 +1,41 @@
+task: rare-planes
+adapter_name: rare-planes
+dataset:
+  id: "s3://rareplanes-public/real"
+  config: instances_aircraft_tiled
+splits:
+  strategy: rareplanes_real_scene_disjoint
+  seed: 0
+  train: {source_split: "real/train+test"}
+  validation: {source_split: "real/train+test"}
+  test: {source_split: "real/train+test"}
+prompt:
+  authoritative_script: ./evaluation/tasks/rare_planes.py
+  system_symbol: SYSTEM_MESSAGE
+  user_symbol: USER_PROMPT
+  dynamic: false
+  dynamic_builder_symbols: [format_count_answer]
+input: {image_count: 1, image_order: [real_satellite_tile]}
+assistant_answer:
+  encoding: json
+  schema: '{"Answer": <nonnegative integer>}'
+  required_keys: [Answer]
+validation:
+  metric: r2
+  direction: maximize
+  fields: []
+  aggregation: null
+  parse_failure_policy: zero_prediction
+paths:
+  raw_dataset_root: ./raw_dataset
+  prepared_dir: ./finetune/data/rare-planes/rare-planes
+  final_adapter_dir: ./finetuned_qwen/rare-planes/rare-planes
+  validation_result_dir: ./finetune_results/qwen3-vl-32b/rare-planes/validation/rare-planes
+  test_result_dir: ./finetune_results/qwen3-vl-32b/rare-planes/test/rare-planes
+  manifest_dir: ./finetune_results/qwen3-vl-32b/rare-planes/manifests/rare-planes
+status:
+  data_preparation: not_started
+  resolution_selection: not_started
+  training: not_started
+  validation: blocked
+  test: blocked

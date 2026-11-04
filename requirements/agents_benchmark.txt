@@ -1,0 +1,6 @@
+openai>=3.42.1
+pillow
+numpy
+scipy
+pyarrow
+shapely

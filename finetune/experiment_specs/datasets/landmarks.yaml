@@ -1,0 +1,40 @@
+task: landmarks
+adapter_name: landmarks
+dataset: {id: danielz01/landmarks, config: NAIP}
+splits:
+  strategy: single_source_80_10_10
+  seed: 0
+  train: {source_split: train}
+  validation: {source_split: train}
+  test: {source_split: train}
+prompt:
+  authoritative_script: ./evaluation/tasks/landmarks.py
+  system_symbol: SYSTEM_MESSAGE
+  user_symbol: get_user_prompt
+  dynamic: true
+  dynamic_builder_symbols: [build_landmark_options]
+input: {image_count: 1, image_order: [landmark_image]}
+generation: {max_new_tokens: 1024, do_sample: false}
+assistant_answer:
+  encoding: plain_text
+  schema: exact_landmark_name_from_five_options
+  required_keys: []
+validation:
+  metric: accuracy
+  direction: maximize
+  fields: []
+  aggregation: null
+  parse_failure_policy: incorrect
+paths:
+  raw_dataset_root: ./raw_dataset
+  prepared_dir: ./finetune/data/landmarks
+  final_adapter_dir: ./finetuned_qwen/landmarks
+  validation_result_dir: ./finetune_results/qwen3-vl-32b/validation/landmarks
+  test_result_dir: ./finetune_results/qwen3-vl-32b/test/landmarks
+  manifest_dir: ./finetune_results/qwen3-vl-32b/manifests/landmarks
+status:
+  data_preparation: not_started
+  resolution_selection: not_started
+  training: not_started
+  validation: not_started
+  test: not_started

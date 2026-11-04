@@ -1,0 +1,35 @@
+task: dior-rsvg-recognition
+adapter_name: dior-rsvg-recognition
+dataset: {id: danielz01/DIOR-RSVG, config: default}
+splits:
+  strategy: reuse_native_train_val_test
+  seed: 0
+  train: {source_split: train}
+  validation: {source_split: val}
+  test: {source_split: test}
+prompt:
+  authoritative_script: ./evaluation/tasks/dior_rsvg_recognition.py
+  system_symbol: SYSTEM_MESSAGE
+  user_symbol: USER_PROMPT
+  dynamic: false
+  dynamic_builder_symbols: []
+input: {image_count: 1, image_order: [marked_satellite_image]}
+generation: {max_new_tokens: 128, do_sample: false}
+assistant_answer:
+  encoding: json
+  schema: '{"category": "<exact category name>"}'
+  required_keys: [category]
+validation:
+  metric: accuracy
+  direction: maximize
+  fields: []
+  aggregation: null
+  parse_failure_policy: incorrect
+paths:
+  raw_dataset_root: ./raw_dataset
+  prepared_dir: ./finetune/data/dior-rsvg-recognition
+  final_adapter_dir: ./finetuned_llava/dior-rsvg-recognition
+  validation_result_dir: ./results/finetune/llava-ov2-8b/validation/dior-rsvg-recognition
+  test_result_dir: ./results/finetune/llava-ov2-8b/test/dior-rsvg-recognition
+  manifest_dir: ./results/finetune/llava-ov2-8b/manifests/dior-rsvg-recognition
+status: {data_preparation: not_started, resolution_selection: not_started, training: not_started, validation: not_started, test: not_started}
